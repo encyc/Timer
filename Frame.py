@@ -1,5 +1,4 @@
 from NoteManager import *
-from AlarmManager import *
 from Dialog import *
 import sys
 
