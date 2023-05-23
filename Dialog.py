@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, \
     QListWidget, QListWidgetItem, QDialog, QLineEdit, QVBoxLayout, QHBoxLayout, QTimeEdit, QMessageBox, QPlainTextEdit
 from PyQt5.QtCore import Qt, QTime
-
+from PyQt5 import QtCore, QtGui, QtWidgets
 from NoteManager import *
 
 
@@ -11,35 +11,89 @@ class TimerApp(QMainWindow):
         self.setWindowTitle("Timer")
         self.setGeometry(100, 100, 600, 400)
         self.note_manager = note_manager
-        self.setup_ui()
 
-    def refresh(self):
-        self.setup_ui.update()
+    def setup_ui(self, MainWindow):
+        # MainWindow
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(800, 600)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        self.tableWidget = QtWidgets.QTableWidget(self.centralwidget)
+        self.tableWidget.setGeometry(QtCore.QRect(20, 40, 751, 461))
 
-    def setup_ui(self):
-        self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
+        # sizePolicy
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.tableWidget.sizePolicy().hasHeightForWidth())
 
-        self.note_list = QListWidget()
-        self.populate_note_list(self.note_list)  # 填充笔记列表
+        # tableWidget
+        self.tableWidget.setSizePolicy(sizePolicy)
+        self.tableWidget.setMouseTracking(False)
+        self.tableWidget.setTabletTracking(False)
+        self.tableWidget.setObjectName("tableWidget")
+        self.tableWidget.setColumnCount(4)
+        self.tableWidget.setRowCount(0)
 
-        self.add_note_button = QPushButton("Add Note")
-        self.delete_note_button = QPushButton("Delete Note")
-        self.alarm_button = QPushButton("Alarms")
+        # item
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(3, item)
+        self.verticalScrollBar = QtWidgets.QScrollBar(self.centralwidget)
+        self.verticalScrollBar.setGeometry(QtCore.QRect(750, 50, 20, 441))
+        self.verticalScrollBar.setOrientation(QtCore.Qt.Vertical)
+        self.verticalScrollBar.setObjectName("verticalScrollBar")
 
-        self.add_note_button.clicked.connect(self.add_note)
-        self.delete_note_button.clicked.connect(self.delete_note)
-        self.alarm_button.clicked.connect(self.open_alarm_page)
+        # pushButton
+        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton.setGeometry(QtCore.QRect(20, 520, 241, 31))
+        self.pushButton.setObjectName("pushButton")
+        self.pushButton.clicked.connect(self.add_note)
 
+        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_2.setGeometry(QtCore.QRect(280, 520, 241, 31))
+        self.pushButton_2.setObjectName("pushButton_2")
+        self.pushButton_2.clicked.connect(self.delete_note)
 
-        buttons_layout = QHBoxLayout()
-        buttons_layout.addWidget(self.add_note_button)
-        buttons_layout.addWidget(self.delete_note_button)
-        buttons_layout.addWidget(self.alarm_button)
+        self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_3.setGeometry(QtCore.QRect(540, 520, 231, 31))
+        self.pushButton_3.setObjectName("pushButton_3")
+        self.pushButton_3.clicked.connect(self.open_alarm_page)
 
-        layout = QVBoxLayout(self.central_widget)
-        layout.addWidget(self.note_list)
-        layout.addLayout(buttons_layout)
+        # munubar
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 23))
+        self.menubar.setObjectName("menubar")
+        MainWindow.setMenuBar(self.menubar)
+
+        # statusbar
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
+
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        item = self.tableWidget.horizontalHeaderItem(0)
+        item.setText(_translate("MainWindow", "Status"))
+        item = self.tableWidget.horizontalHeaderItem(1)
+        item.setText(_translate("MainWindow", "Note"))
+        item = self.tableWidget.horizontalHeaderItem(2)
+        item.setText(_translate("MainWindow", "Subscribe"))
+        item = self.tableWidget.horizontalHeaderItem(3)
+        item.setText(_translate("MainWindow", "Timer"))
+        self.pushButton.setText(_translate("MainWindow", "Add Note"))
+        self.pushButton_2.setText(_translate("MainWindow", "Delete Note"))
+        self.pushButton_3.setText(_translate("MainWindow", "Nothing"))
 
 
     def populate_note_list(self, note_list):
@@ -52,19 +106,18 @@ class TimerApp(QMainWindow):
 
     def add_note(self):
         note_dialog = NoteDialog()
-        note_manager = NoteManager()
         if note_dialog.exec_() == QDialog.Accepted:
-            title_edit, content_edit = note_dialog.get_note()
-            note_manager.add_note(title_edit, content_edit)
+            title_edit, content_edit, datetime_edit = note_dialog.get_note()
+            self.note_manager.add_note(title_edit, content_edit, datetime_edit)
         # QApplication.processEvents()
-        self.populate_note_list(self.note_list)
+        # self.populate_note_list(self.note_list)
     def delete_note(self):
         selected_items = self.note_list.selectedItems()
-        for item in selected_items:
-            index = self.note_list.row(item)
-            del self.notes[index]
+        print(selected_items)
+        # for item in selected_items:
+        #     index = self.note_list.row(item)
+        #     del self.notes[index]
 
-        self.refresh_note_list()
 
     def open_alarm_page(self, note):
         alarm_page = AlarmPage(note.get_alarms())
@@ -92,133 +145,69 @@ class TimerApp(QMainWindow):
             event.ignore()
 
 
+from PyQt5.QtCore import Qt, QDateTime
+from PyQt5.QtWidgets import QDialog, QLineEdit, QDateTimeEdit, QVBoxLayout, QFormLayout, QDialogButtonBox, QCheckBox, QSizePolicy
+
+
 class NoteDialog(QDialog):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Add Note")
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle('Add Note')
 
-        self.title_label = QLabel("Title:")
+        # Create input boxes
         self.title_edit = QLineEdit()
-        self.content_label = QLabel("Content:")
-        self.content_edit = QPlainTextEdit()
-        self.save_button = QPushButton("Save")
-        self.cancel_button = QPushButton("Cancel")
+        self.content_edit = QLineEdit()
+        self.datetime_edit = QDateTimeEdit(QDateTime.currentDateTime())
 
-        layout = QVBoxLayout(self)
-        layout.addWidget(self.title_label)
-        layout.addWidget(self.title_edit)
-        layout.addWidget(self.content_label)
-        layout.addWidget(self.content_edit)
-        layout.addWidget(self.save_button)
-        layout.addWidget(self.cancel_button)
+        # Create check box to show/hide date/time input box
+        # self.show_datetime_check_box = QCheckBox('Set Alarm')
+        # self.show_datetime_check_box.setChecked(True)
+        # self.show_datetime_check_box.stateChanged.connect(self.on_show_datetime_state_changed)
 
-        self.save_button.clicked.connect(self.accept)
-        self.cancel_button.clicked.connect(self.reject)
 
-        self.nm = NoteManager()
+        # Set content text box alignment to top-left
+        self.content_edit.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+
+        # Set stretch factor for content text box to make it larger
+        self.content_edit.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.content_edit.setMinimumHeight(100)
+
+
+        # Create form layout and add input boxes
+        form_layout = QFormLayout()
+        form_layout.addRow('Title:', self.title_edit)
+        form_layout.addRow('Content:', self.content_edit)
+
+
+        # form_layout.addRow(self.show_datetime_check_box)
+        # self.datetime_row_index = form_layout.rowCount()
+        form_layout.addRow('Alarm:', self.datetime_edit)
+        # self.datetime_edit.setVisible(True)
+
+        # Create Save and Cancel buttons
+        button_box = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
+        button_box.accepted.connect(self.accept)
+        button_box.rejected.connect(self.reject)
+
+        # Create vertical layout and add form layout and button box
+        layout = QVBoxLayout()
+        layout.addLayout(form_layout)
+        layout.addWidget(button_box)
+
+        # Set layout for QDialog
+        self.setLayout(layout)
 
     def get_note(self):
         title_edit = self.title_edit.text()
         content_edit = self.content_edit.toPlainText()
+        datetime_edit = self.datetime_edit.toPlainText()
+        print(datetime_edit)
         # note = {'title:' self.title_edit, 'content':self.content_edit}
         # set_title(self.title_edit.text())
         # set_content(self.content_edit.toPlainText())
-        return title_edit, content_edit
+        return title_edit, content_edit, datetime_edit
 
+    # def on_show_datetime_state_changed(self, state):
+    #     self.datetime_edit.setVisible(state == Qt.Checked)
+    #     self.layout().itemAt(self.datetime_row_index).widget().setVisible(state == Qt.Checked)
 
-
-class AlarmPage(QDialog):
-    def __init__(self, alarms):
-        super().__init__()
-        self.setWindowTitle("Alarms")
-
-        self.alarms = alarms
-
-        self.alarm_list = QListWidget()
-        self.add_alarm_button = QPushButton("Add Alarm")
-        self.delete_alarm_button = QPushButton("Delete Alarm")
-        self.save_button = QPushButton("Save")
-        self.cancel_button = QPushButton("Cancel")
-
-        buttons_layout = QHBoxLayout()
-        buttons_layout.addWidget(self.add_alarm_button)
-        buttons_layout.addWidget(self.delete_alarm_button)
-        buttons_layout.addWidget(self.save_button)
-        buttons_layout.addWidget(self.cancel_button)
-
-        layout = QVBoxLayout(self)
-        layout.addWidget(self.alarm_list)
-        layout.addLayout(buttons_layout)
-
-        self.add_alarm_button.clicked.connect(self.add_alarm)
-        self.delete_alarm_button.clicked.connect(self.delete_alarm)
-        self.save_button.clicked.connect(self.accept)
-        self.cancel_button.clicked.connect(self.reject)
-
-        self.refresh_alarm_list()
-
-    def add_alarm(self):
-        alarm_dialog = AlarmDialog()
-        if alarm_dialog.exec_() == QDialog.Accepted:
-            alarm = alarm_dialog.get_alarm()
-            self.alarms.append(alarm)
-            self.refresh_alarm_list()
-
-    def delete_alarm(self):
-        selected_items = self.alarm_list.selectedItems()
-        for item in selected_items:
-            index = self.alarm_list.row(item)
-            del self.alarms[index]
-
-        self.refresh_alarm_list()
-
-    def get_alarms(self):
-        return self.alarms
-
-    def refresh_alarm_list(self):
-        self.alarm_list.clear()
-        for alarm in self.alarms:
-            item = QListWidgetItem(alarm.get_info())
-            item.setFlags(item.flags() | Qt.ItemIsEditable)
-            self.alarm_list.addItem(item)
-
-
-class AlarmDialog(QDialog):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Add Alarm")
-
-        self.name_label = QLabel("Name:")
-        self.name_edit = QLineEdit()
-        self.time_label = QLabel("Time:")
-        self.time_edit = QTimeEdit()
-        self.repeat_label = QLabel("Repeat:")
-        self.repeat_edit = QLineEdit()
-        self.sound_label = QLabel("Sound:")
-        self.sound_edit = QLineEdit()
-        self.save_button = QPushButton("Save")
-        self.cancel_button = QPushButton("Cancel")
-
-        layout = QVBoxLayout(self)
-        layout.addWidget(self.name_label)
-        layout.addWidget(self.name_edit)
-        layout.addWidget(self.time_label)
-        layout.addWidget(self.time_edit)
-        layout.addWidget(self.repeat_label)
-        layout.addWidget(self.repeat_edit)
-        layout.addWidget(self.sound_label)
-        layout.addWidget(self.sound_edit)
-        layout.addWidget(self.save_button)
-        layout.addWidget(self.cancel_button)
-
-        self.save_button.clicked.connect(self.accept)
-        self.cancel_button.clicked.connect(self.reject)
-
-    def get_alarm(self):
-        name = self.name_edit.text()
-        time = self.time_edit.time()
-        repeat = self.repeat_edit.text()
-        sound = self.sound_edit.text()
-
-        alarm = Alarm(name, time, repeat, sound)
-        return alarm

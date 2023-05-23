@@ -1,40 +1,34 @@
-import sys, time
-from PyQt5.QtWidgets import QWidget, QPushButton, QApplication, QListWidget, QGridLayout
 
+class NoteDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Add Note")
 
-class WinForm(QWidget):
-    def __init__(self, parent=None):
-        super(WinForm, self).__init__(parent)
-        # 设置标题与布局方式
-        self.setWindowTitle('实时刷新界面的例子')
-        layout = QGridLayout()
+        self.title_label = QLabel("Title:")
+        self.title_edit = QLineEdit()
+        self.content_label = QLabel("Content:")
+        self.content_edit = QPlainTextEdit()
+        self.save_button = QPushButton("Save")
+        self.cancel_button = QPushButton("Cancel")
 
-        # 实例化列表控件与按钮控件
-        self.listFile = QListWidget()
-        self.btnStart = QPushButton('开始')
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.title_label)
+        layout.addWidget(self.title_edit)
+        layout.addWidget(self.content_label)
+        layout.addWidget(self.content_edit)
+        layout.addWidget(self.save_button)
+        layout.addWidget(self.cancel_button)
 
-        # 添加到布局中指定位置
-        layout.addWidget(self.listFile, 0, 0, 1, 2)
-        layout.addWidget(self.btnStart, 1, 1)
+        self.save_button.clicked.connect(self.accept)
+        self.cancel_button.clicked.connect(self.reject)
 
-        # 按钮的点击信号触发自定义的函数
-        self.btnStart.clicked.connect(self.slotAdd)
-        self.setLayout(layout)
+        self.nm = NoteManager()
 
-    def slotAdd(self):
-        for n in range(10):
-            # 获取条目文本
-            str_n = 'File index{0}'.format(n)
-            # 添加文本到列表控件中
-            self.listFile.addItem(str_n)
-            # 实时刷新界面
-            QApplication.processEvents()
-            # 睡眠一秒
-            time.sleep(1)
+    def get_note(self):
+        title_edit = self.title_edit.text()
+        content_edit = self.content_edit.toPlainText()
+        # note = {'title:' self.title_edit, 'content':self.content_edit}
+        # set_title(self.title_edit.text())
+        # set_content(self.content_edit.toPlainText())
+        return title_edit, content_edit
 
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    win = WinForm()
-    win.show()
-    sys.exit(app.exec_())
