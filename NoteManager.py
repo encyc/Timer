@@ -28,7 +28,8 @@ class NoteManager:
     def add_note(self, title, content, datetime):
         # 创建一个新的笔记，并添加到self.notes列表中
         # 参数title为笔记标题，参数content为笔记内容
-        note = {'title': title, 'content': content, 'datetime_edit': datetime}
+        # note = {'title': title, 'content': content, 'datetime_edit': datetime}
+        note = [title, content, datetime]
         self.notes.append(note)
         self.save_notes()  # 保存笔记列表
 

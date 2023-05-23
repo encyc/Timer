@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, \
-    QListWidget, QListWidgetItem, QDialog, QLineEdit, QVBoxLayout, QHBoxLayout, QTimeEdit, QMessageBox, QPlainTextEdit
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, \
+    QListWidget, QListWidgetItem, QDialog, QLineEdit, QVBoxLayout, QHBoxLayout, QTimeEdit, QMessageBox, QPlainTextEdit, QHeaderView
 from PyQt5.QtCore import Qt, QTime
 from PyQt5 import QtCore, QtGui, QtWidgets
 from NoteManager import *
@@ -11,6 +11,23 @@ class TimerApp(QMainWindow):
         self.setWindowTitle("Timer")
         self.setGeometry(100, 100, 600, 400)
         self.note_manager = note_manager
+        self.note_list = None
+
+    def get_note_list(self):
+        self.note_manager.load_notes()
+        note_list = self.note_manager.notes
+        for i in range(len(note_list)):
+            item = note_list[i]
+            row = self.tableWidget.rowCount()
+            self.tableWidget.insertRow(row)
+            for j in range(len(item)):
+                item = QTableWidgetItem(str(note_list[i][j]))
+                self.tableWidget.setItem(row, j, item)
+        # self.note_list = QTableWidgetItem()
+        # self.note_list.setFlags()
+        # self.note_list.setFlags(self.note_list.flags() ^ Qt.ItemIsEditable)  # 设置Item为只读
+        # self.note_list.setItem(row, column, self.note_list)
+
 
     def setup_ui(self, MainWindow):
         # MainWindow
@@ -35,6 +52,8 @@ class TimerApp(QMainWindow):
         self.tableWidget.setColumnCount(4)
         self.tableWidget.setRowCount(0)
 
+        self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+
         # item
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(0, item)
@@ -48,6 +67,11 @@ class TimerApp(QMainWindow):
         self.verticalScrollBar.setGeometry(QtCore.QRect(750, 50, 20, 441))
         self.verticalScrollBar.setOrientation(QtCore.Qt.Vertical)
         self.verticalScrollBar.setObjectName("verticalScrollBar")
+
+        # TODO: 修改get_note_ist(),现在是每次添加,都会把历史数据重新加载一次
+        self.get_note_list()
+
+
 
         # pushButton
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
@@ -63,7 +87,7 @@ class TimerApp(QMainWindow):
         self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_3.setGeometry(QtCore.QRect(540, 520, 231, 31))
         self.pushButton_3.setObjectName("pushButton_3")
-        self.pushButton_3.clicked.connect(self.open_alarm_page)
+        # self.pushButton_3.clicked.connect(self.open_alarm_page)
 
         # munubar
         MainWindow.setCentralWidget(self.centralwidget)
@@ -83,14 +107,15 @@ class TimerApp(QMainWindow):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+
         item = self.tableWidget.horizontalHeaderItem(0)
-        item.setText(_translate("MainWindow", "Status"))
-        item = self.tableWidget.horizontalHeaderItem(1)
         item.setText(_translate("MainWindow", "Note"))
-        item = self.tableWidget.horizontalHeaderItem(2)
+        item = self.tableWidget.horizontalHeaderItem(1)
         item.setText(_translate("MainWindow", "Subscribe"))
-        item = self.tableWidget.horizontalHeaderItem(3)
+        item = self.tableWidget.horizontalHeaderItem(2)
         item.setText(_translate("MainWindow", "Timer"))
+        item = self.tableWidget.horizontalHeaderItem(3)
+        item.setText(_translate("MainWindow", "Status"))
         self.pushButton.setText(_translate("MainWindow", "Add Note"))
         self.pushButton_2.setText(_translate("MainWindow", "Delete Note"))
         self.pushButton_3.setText(_translate("MainWindow", "Nothing"))
@@ -111,6 +136,7 @@ class TimerApp(QMainWindow):
             self.note_manager.add_note(title_edit, content_edit, datetime_edit)
         # QApplication.processEvents()
         # self.populate_note_list(self.note_list)
+        self.get_note_list()
     def delete_note(self):
         selected_items = self.note_list.selectedItems()
         print(selected_items)
@@ -119,11 +145,6 @@ class TimerApp(QMainWindow):
         #     del self.notes[index]
 
 
-    def open_alarm_page(self, note):
-        alarm_page = AlarmPage(note.get_alarms())
-        if alarm_page.exec_() == QDialog.Accepted:
-            alarms = alarm_page.get_alarms()
-            note.set_alarms(alarms)
 
     def refresh_note_list(self):
         # self.note_list.clear()
@@ -199,9 +220,9 @@ class NoteDialog(QDialog):
 
     def get_note(self):
         title_edit = self.title_edit.text()
-        content_edit = self.content_edit.toPlainText()
-        datetime_edit = self.datetime_edit.toPlainText()
-        print(datetime_edit)
+        content_edit = self.content_edit.text()
+        datetime_edit = self.datetime_edit.text()
+        print(title_edit, content_edit, datetime_edit)
         # note = {'title:' self.title_edit, 'content':self.content_edit}
         # set_title(self.title_edit.text())
         # set_content(self.content_edit.toPlainText())
