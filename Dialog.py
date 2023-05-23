@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHB
     QListWidget, QListWidgetItem, QDialog, QLineEdit, QVBoxLayout, QHBoxLayout, QTimeEdit, QMessageBox, QPlainTextEdit
 from PyQt5.QtCore import Qt, QTime
 
-
+from NoteManager import *
 
 
 class TimerApp(QMainWindow):
@@ -12,6 +12,9 @@ class TimerApp(QMainWindow):
         self.setGeometry(100, 100, 600, 400)
         self.note_manager = note_manager
         self.setup_ui()
+
+    def refresh(self):
+        self.setup_ui.update()
 
     def setup_ui(self):
         self.central_widget = QWidget()
@@ -41,6 +44,7 @@ class TimerApp(QMainWindow):
 
     def populate_note_list(self, note_list):
         note_list.clear()
+        self.note_manager.load_notes()
         for note in self.note_manager.notes:
             note_title = note.get('title')
             note_list.addItem(note_title)
@@ -50,19 +54,10 @@ class TimerApp(QMainWindow):
         note_dialog = NoteDialog()
         note_manager = NoteManager()
         if note_dialog.exec_() == QDialog.Accepted:
-
             title_edit, content_edit = note_dialog.get_note()
             note_manager.add_note(title_edit, content_edit)
-            #
-            # self.note_list.append(note)
-            # self.refresh_note_list()
-            #
-            # # Get the newly added note item
-            # item = self.note_list.item(self.note_list.count() - 1)
-            #
-            # # Connect the item clicked event to open the alarm page
-            # item.clicked.connect(lambda: self.open_alarm_page(note))
-
+        # QApplication.processEvents()
+        self.populate_note_list(self.note_list)
     def delete_note(self):
         selected_items = self.note_list.selectedItems()
         for item in selected_items:
@@ -78,20 +73,18 @@ class TimerApp(QMainWindow):
             note.set_alarms(alarms)
 
     def refresh_note_list(self):
-        self.note_list.clear()
-        for note in self.notes:
-            item = QListWidgetItem(note.get_title())
-            item.setFlags(item.flags() | Qt.ItemIsEditable)
-            self.note_list.addItem(item)
-
-            # Add alarm icon
-            alarm_icon = QLabel()
-            alarm_icon.setPixmap(
-                QApplication.style().standardIcon(QApplication.IconMode.Computer).pixmap(16, 16))
-            self.note_list.setItemWidget(item, alarm_icon)
+        # self.note_list.clear()
+        self.note_list = self.note_manager.load_notes()
+        print(self.note_list)
+        self.populate_note_list(self.note_list)
+            # # Add alarm icon
+            # alarm_icon = QLabel()
+            # alarm_icon.setPixmap(
+            #     QApplication.style().standardIcon(QApplication.IconMode.Computer).pixmap(16, 16))
+            # self.note_list.setItemWidget(item, alarm_icon)
 
     def closeEvent(self, event):
-        reply = QMessageBox.question(self, "Quit", "Are you sure you want to quit?", QMessageBox.Yes | QMessageBox.No,
+        reply = QMessageBox.question(self, "Quit", "See you my friend", QMessageBox.Yes | QMessageBox.No,
                                      QMessageBox.No)
         if reply == QMessageBox.Yes:
             event.accept()
@@ -125,13 +118,12 @@ class NoteDialog(QDialog):
         self.nm = NoteManager()
 
     def get_note(self):
-        title_edit = self.title_edit
-        content_edit = self.content_edit
+        title_edit = self.title_edit.text()
+        content_edit = self.content_edit.toPlainText()
         # note = {'title:' self.title_edit, 'content':self.content_edit}
         # set_title(self.title_edit.text())
         # set_content(self.content_edit.toPlainText())
         return title_edit, content_edit
-
 
 
 

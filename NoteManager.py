@@ -1,4 +1,3 @@
-
 import json
 
 class NoteManager:
@@ -13,7 +12,10 @@ class NoteManager:
         try:
             with open(self.notes_file, 'r') as f:
                 self.notes = json.load(f)
+                print(self.notes)
+                print('success')
         except FileNotFoundError:
+            print('FileNotFoundError')
             # 如果文件不存在，则不做任何操作
             pass
 
