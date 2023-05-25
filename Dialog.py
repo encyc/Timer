@@ -151,11 +151,16 @@ class TimerApp(QMainWindow):
 
 
     def delete_note(self):
-        selected_items = self.note_list.selectedItems()
-        print(selected_items)
-        # for item in selected_items:
-        #     index = self.note_list.row(item)
-        #     del self.notes[index]
+        selected_items = self.tableWidget.selectedItems()
+        for item in selected_items:
+            row = item.row()  # 获取选中文本所在的行
+            column = item.column()  # 获取选中文本所在的列
+            contents = item.text()  # 获取选中文本内容
+            print("选择的内容为：", contents)
+            print("所选的内容所在的行为：", row)
+            print("所选的内容所在的列为：", column)
+            self.note_manager.delete_note(row)
+            self.refresh_note_list()
 
 
     #
