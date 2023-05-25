@@ -23,10 +23,6 @@ class TimerApp(QMainWindow):
             for j in range(len(item)):
                 item = QTableWidgetItem(str(note_list[i][j]))
                 self.tableWidget.setItem(row, j, item)
-        # self.note_list = QTableWidgetItem()
-        # self.note_list.setFlags()
-        # self.note_list.setFlags(self.note_list.flags() ^ Qt.ItemIsEditable)  # 设置Item为只读
-        # self.note_list.setItem(row, column, self.note_list)
 
 
     def setup_ui(self, MainWindow):
@@ -64,9 +60,7 @@ class TimerApp(QMainWindow):
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(3, item)
         self.verticalScrollBar = QtWidgets.QScrollBar(self.centralwidget)
-        self.verticalScrollBar.setGeometry(QtCore.QRect(750, 50, 20, 441))
-        self.verticalScrollBar.setOrientation(QtCore.Qt.Vertical)
-        self.verticalScrollBar.setObjectName("verticalScrollBar")
+
 
         # TODO: 修改get_note_ist(),现在是每次添加,都会把历史数据重新加载一次
         self.get_note_list()
@@ -120,13 +114,30 @@ class TimerApp(QMainWindow):
         self.pushButton_2.setText(_translate("MainWindow", "Delete Note"))
         self.pushButton_3.setText(_translate("MainWindow", "Nothing"))
 
+    # def populate_note_list(self, note_list):
+    #     self.note_list.clear()
+    #     self.note_manager.load_notes()
+    #     for note in self.note_manager.notes:
+    #         # note_title = note.get('title')
+    #         note_title = note
+    #         note_list.addItem(note_title)
 
-    def populate_note_list(self, note_list):
-        note_list.clear()
+    def refresh_note_list(self):
+        self.tableWidget.clear()
         self.note_manager.load_notes()
-        for note in self.note_manager.notes:
-            note_title = note.get('title')
-            note_list.addItem(note_title)
+        print(self.note_manager.notes)
+        self.note_list = self.note_manager.notes
+        row = self.tableWidget.rowCount()
+        for i in range(len(self.note_list)):
+            print(i)
+            item = self.note_list[i]
+            # row = self.tableWidget.rowCount()
+            print(row,item )
+            if i == row:
+                self.tableWidget.insertRow(i)
+            for j in range(len(item)):
+                item = QTableWidgetItem(str(self.note_list[i][j]))
+                self.tableWidget.setItem(i, j, item)
 
 
     def add_note(self):
@@ -135,8 +146,10 @@ class TimerApp(QMainWindow):
             title_edit, content_edit, datetime_edit = note_dialog.get_note()
             self.note_manager.add_note(title_edit, content_edit, datetime_edit)
         # QApplication.processEvents()
-        # self.populate_note_list(self.note_list)
-        self.get_note_list()
+        self.refresh_note_list()
+        # self.get_note_list()
+
+
     def delete_note(self):
         selected_items = self.note_list.selectedItems()
         print(selected_items)
@@ -145,17 +158,17 @@ class TimerApp(QMainWindow):
         #     del self.notes[index]
 
 
-
-    def refresh_note_list(self):
-        # self.note_list.clear()
-        self.note_list = self.note_manager.load_notes()
-        print(self.note_list)
-        self.populate_note_list(self.note_list)
-            # # Add alarm icon
-            # alarm_icon = QLabel()
-            # alarm_icon.setPixmap(
-            #     QApplication.style().standardIcon(QApplication.IconMode.Computer).pixmap(16, 16))
-            # self.note_list.setItemWidget(item, alarm_icon)
+    #
+    # def refresh_note_list(self):
+    #     # self.note_list.clear()
+    #     self.note_list = self.note_manager.load_notes()
+    #     print(self.note_list)
+    #     self.populate_note_list(self.note_list)
+    #         # # Add alarm icon
+    #         # alarm_icon = QLabel()
+    #         # alarm_icon.setPixmap(
+    #         #     QApplication.style().standardIcon(QApplication.IconMode.Computer).pixmap(16, 16))
+    #         # self.note_list.setItemWidget(item, alarm_icon)
 
     def closeEvent(self, event):
         reply = QMessageBox.question(self, "Quit", "See you my friend", QMessageBox.Yes | QMessageBox.No,
