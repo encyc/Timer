@@ -197,6 +197,8 @@ class NoteDialog(QDialog):
         self.title_edit = QLineEdit()
         self.content_edit = QLineEdit()
         self.datetime_edit = QDateTimeEdit(QDateTime.currentDateTime())
+        # self.datetime_edit.tostring("yyyy-MM-dd hh:mm:ss")
+        # print(type(self.datetime_edit))
 
         # Create check box to show/hide date/time input box
         # self.show_datetime_check_box = QCheckBox('Set Alarm')
