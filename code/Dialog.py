@@ -1,6 +1,9 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, \
-    QListWidget, QListWidgetItem, QDialog, QLineEdit, QVBoxLayout, QHBoxLayout, QTimeEdit, QMessageBox, QPlainTextEdit, QHeaderView
-from PyQt5.QtCore import Qt, QTime
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QWidget, QVBoxLayout, QHBoxLayout, QLabel, \
+    QPushButton, QSystemTrayIcon, QMenu, \
+    QListWidget, QListWidgetItem, QDialog, QLineEdit, QVBoxLayout, QHBoxLayout, QTimeEdit, QMessageBox, QPlainTextEdit, \
+    QHeaderView
+from PyQt5.QtCore import Qt, QTime, QCoreApplication
+from PyQt5.QtGui import QIcon
 from PyQt5 import QtCore, QtGui, QtWidgets
 from NoteManager import *
 from AlarmManager import *
@@ -8,13 +11,16 @@ from AlarmManager import *
 class TimerApp(QMainWindow):
     def __init__(self):
         super().__init__()
-        # 设置Timer主窗口
+
+        # 设置 Timer 主窗口
         self.setWindowTitle("Timer")
         self.setGeometry(100, 100, 600, 400)
-        # 初始化NoteManager类
+
+        # 初始化 NoteManager 类
         self.note_manager = NoteManager()
         self.note_list = None
-        # 初始化AlarmManger类
+
+        # 初始化 AlarmManger 类
         self.alarm_manager = AlarmManager()
         self.alarm_list = None
 
@@ -83,7 +89,6 @@ class TimerApp(QMainWindow):
         self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_3.setGeometry(QtCore.QRect(540, 520, 231, 31))
         self.pushButton_3.setObjectName("pushButton_3")
-        # self.pushButton_3.clicked.connect(self.open_alarm_page)
 
         # munubar
         MainWindow.setCentralWidget(self.centralwidget)
@@ -100,6 +105,8 @@ class TimerApp(QMainWindow):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
@@ -107,9 +114,9 @@ class TimerApp(QMainWindow):
         item = self.tableWidget.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Note"))
         item = self.tableWidget.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "Subscribe"))
+        item.setText(_translate("MainWindow", "Subscribution"))
         item = self.tableWidget.horizontalHeaderItem(2)
-        item.setText(_translate("MainWindow", "Timer"))
+        item.setText(_translate("MainWindow", "Alarm"))
         item = self.tableWidget.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "Status"))
         self.pushButton.setText(_translate("MainWindow", "Add Note"))
@@ -129,21 +136,19 @@ class TimerApp(QMainWindow):
     def refresh_note_list(self):
         self.tableWidget.clear()
         self.note_manager.load_notes()
-        print(self.note_manager.notes)
+        # print(self.note_manager.notes)
         self.note_list = self.note_manager.notes
         row = self.tableWidget.rowCount()
         for i in range(len(self.note_list)):
-            print(i)
             item = self.note_list[i]
             # row = self.tableWidget.rowCount()
-            print(row,item )
             if i == row:
                 self.tableWidget.insertRow(i)
             for j in range(len(item)):
                 item = QTableWidgetItem(str(self.note_list[i][j]))
                 self.tableWidget.setItem(i, j, item)
-                self.tableWidget.setHorizontalHeaderItem()
-                # self.retranslateUi(self.tableWidget)
+                self.tableWidget.setHorizontalHeaderLabels(["Note", "Subscribution", "Alarm", "Status"])
+
 
     def add_note(self):
         note_dialog = NoteDialog()
@@ -163,9 +168,9 @@ class TimerApp(QMainWindow):
             column = item.column()  # 获取选中文本所在的列
             contents = item.text()  # 获取选中文本内容
             title = self.note_manager.notes[row][0]
-            print("选择的内容为：", contents)
-            print("所选的内容所在的行为：", row)
-            print("所选的内容所在的列为：", column)
+            # print("选择的内容为：", contents)
+            # print("所选的内容所在的行为：", row)
+            # print("所选的内容所在的列为：", column)
 
             self.note_manager.delete_note(row)
             self.alarm_manager.cancel_alarm(title)
@@ -224,14 +229,6 @@ class NoteDialog(QDialog):
         self.title_edit = QLineEdit()
         self.content_edit = QLineEdit()
         self.datetime_edit = QDateTimeEdit(QDateTime.currentDateTime())
-        # self.datetime_edit.tostring("yyyy-MM-dd hh:mm:ss")
-        # print(type(self.datetime_edit))
-
-        # Create check box to show/hide date/time input box
-        # self.show_datetime_check_box = QCheckBox('Set Alarm')
-        # self.show_datetime_check_box.setChecked(True)
-        # self.show_datetime_check_box.stateChanged.connect(self.on_show_datetime_state_changed)
-
 
         # Set content text box alignment to top-left
         self.content_edit.setAlignment(Qt.AlignTop | Qt.AlignLeft)

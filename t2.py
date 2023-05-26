@@ -1,55 +1,57 @@
-"""
-好的，你可以通过使用 `QMessageBox` 对话框，来提示用户再次确认删除操作。下面是一个示例代码，可以在PyQt5中实现这一功能：
-"""
-from PyQt5 import QtWidgets, QtGui
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QApplication, QMainWindow, QSystemTrayIcon, QMenu
 
+class Example(QMainWindow):
 
-class MyWindow(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
 
-        self.init_ui()
+        # 初始化 QSystemTrayIcon 对象
+        self.tray_icon = QSystemTrayIcon(self)
+        self.tray_icon.setIcon(QIcon("icon.png"))
+        self.tray_icon.setToolTip("Minimize to Tray")
 
-    def init_ui(self):
-        # 创建删除按钮
-        self.delete_button = QtWidgets.QPushButton('Delete', self)
-        self.delete_button.move(50, 50)
-        self.delete_button.clicked.connect(self.on_delete_button_clicked)
+        # 创建菜单
+        menu = QMenu(self)
+        action_open = menu.addAction("Open")
+        action_exit = menu.addAction("Exit")
+        self.tray_icon.setContextMenu(menu)
 
-        self.setGeometry(200, 200, 300, 300)
-        self.setWindowTitle('Delete Confirmation')
-        self.show()
+        # 信号槽连接
+        action_exit.triggered.connect(qApp.quit)
 
-    def on_delete_button_clicked(self):
-        # 创建消息框
-        msg_box = QMessageBox()
-        msg_box.setIcon(QMessageBox.Question)
-        msg_box.setText("Are you sure you want to delete?")
-        msg_box.setWindowTitle("Delete Confirmation")
-        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
-        msg_box.button(QMessageBox.Yes).setText('Delete')
+        # 隐藏窗口
+        self.setWindowFlags(Qt.WindowMinimizeButtonHint)
+        self.hide()
 
-        # 监听消息框里按钮的点击事件
-        result = msg_box.exec_()
-        if result == QMessageBox.Yes:
-            # 用户选择了 "Delete" 按钮
-            self.delete_item()
-        else:
-            # 用户选择了 "Cancel" 按钮，不做操作
-            pass
-
-    def delete_item(self):
-        # 在这里写你的删除操作
-        print('已删除！')
-
+        # 显示托盘图标
+        self.tray_icon.show()
 
 if __name__ == '__main__':
-    app = QtWidgets.QApplication([])
-    window = MyWindow()
+    app = QApplication([])
+    ex = Example()
     app.exec_()
-"""
-在上面的代码中，我们使用 `QMessageBox` 对话框来提示用户确认删除操作。对话框中包含一个文本消息和两个按钮（Yes 和 Cancel），我们使用 `setStandardButtons()`方法来设置按钮。然后，我们使用 `exec_()`方法来显示对话框，并检查用户点击的按钮。如果用户点击了 "Yes" 按钮，则执行了 `delete_item()` 方法，否则什么也不做。
 
-你可以将相关的删除操作写在 `delete_item()` 方法中。需要注意的是，这个方法应该根据你的程序逻辑进行编写，这里展示的是一个简单的示例。
-"""
+from PyQt5.QtWidgets import QApplication
+
+
+class TimerApp(QMainWindow):
+    def __init__(self, app):
+        super().__init__()
+
+        # 设置 Timer 主窗口
+        self.setWindowTitle("Timer")
+        self.setGeometry(100, 100, 600, 400)
+
+        # ...
+
+        # 信号槽连接
+        action_exit.triggered.connect(app.quit)
+
+        # 隐藏窗口
+        self.setWindowFlags(Qt.WindowMinimizeButtonHint)
+        self.hide()
+
+        # 显示托盘图标
+        self.tray_icon.show()
