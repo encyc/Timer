@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 import threading
 from plyer import notification
+import plyer.platforms
 
 
 class AlarmManager:
