@@ -3,15 +3,20 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QWidget
 from PyQt5.QtCore import Qt, QTime
 from PyQt5 import QtCore, QtGui, QtWidgets
 from NoteManager import *
-
+from AlarmManager import *
 
 class TimerApp(QMainWindow):
-    def __init__(self,note_manager):
+    def __init__(self):
         super().__init__()
+        # 设置Timer主窗口
         self.setWindowTitle("Timer")
         self.setGeometry(100, 100, 600, 400)
-        self.note_manager = note_manager
+        # 初始化NoteManager类
+        self.note_manager = NoteManager()
         self.note_list = None
+        # 初始化AlarmManger类
+        self.alarm_manager = AlarmManager()
+        self.alarm_list = None
 
     def get_note_list(self):
         self.note_manager.load_notes()
@@ -61,11 +66,8 @@ class TimerApp(QMainWindow):
         self.tableWidget.setHorizontalHeaderItem(3, item)
         self.verticalScrollBar = QtWidgets.QScrollBar(self.centralwidget)
 
-
-        # TODO: 修改get_note_ist(),现在是每次添加,都会把历史数据重新加载一次
+        # 加载历史note信息
         self.get_note_list()
-
-
 
         # pushButton
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
@@ -112,7 +114,9 @@ class TimerApp(QMainWindow):
         item.setText(_translate("MainWindow", "Status"))
         self.pushButton.setText(_translate("MainWindow", "Add Note"))
         self.pushButton_2.setText(_translate("MainWindow", "Delete Note"))
-        self.pushButton_3.setText(_translate("MainWindow", "Nothing"))
+
+        # TODO:添加Setting界面内容
+        self.pushButton_3.setText(_translate("MainWindow", "Setting"))
 
     # def populate_note_list(self, note_list):
     #     self.note_list.clear()
@@ -145,6 +149,7 @@ class TimerApp(QMainWindow):
         if note_dialog.exec_() == QDialog.Accepted:
             title_edit, content_edit, datetime_edit = note_dialog.get_note()
             self.note_manager.add_note(title_edit, content_edit, datetime_edit)
+            self.alarm_manager.set_alarm(title_edit,content_edit,datetime_edit,title_edit)
         # QApplication.processEvents()
         self.refresh_note_list()
         # self.get_note_list()

@@ -5,7 +5,8 @@ import sys
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     widgets = QtWidgets.QMainWindow()
-    timer_app = TimerApp(NoteManager())
+    timer_app = TimerApp()
+
     timer_app.setup_ui(widgets)
     widgets.show()
 
