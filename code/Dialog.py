@@ -78,7 +78,7 @@ class TimerApp(QMainWindow):
         self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_2.setGeometry(QtCore.QRect(280, 520, 241, 31))
         self.pushButton_2.setObjectName("pushButton_2")
-        self.pushButton_2.clicked.connect(self.delete_note)
+        self.pushButton_2.clicked.connect(self.on_delete_button_clicked)
 
         self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_3.setGeometry(QtCore.QRect(540, 520, 231, 31))
@@ -161,12 +161,33 @@ class TimerApp(QMainWindow):
             row = item.row()  # 获取选中文本所在的行
             column = item.column()  # 获取选中文本所在的列
             contents = item.text()  # 获取选中文本内容
+            title = self.note_manager.notes[row][0]
             print("选择的内容为：", contents)
             print("所选的内容所在的行为：", row)
             print("所选的内容所在的列为：", column)
+
             self.note_manager.delete_note(row)
+            self.alarm_manager.cancel_alarm(title)
+
             self.refresh_note_list()
 
+    def on_delete_button_clicked(self):
+        # 创建消息框
+        msg_box = QMessageBox()
+        msg_box.setIcon(QMessageBox.Question)
+        msg_box.setText("Confirm?")
+        msg_box.setWindowTitle("Delete Confirmation")
+        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.Cancel)
+        msg_box.button(QMessageBox.Yes).setText('Delete')
+
+        # 监听消息框里按钮的点击事件
+        result = msg_box.exec_()
+        if result == QMessageBox.Yes:
+            # 用户选择了 "Delete" 按钮
+            self.delete_note()
+        else:
+            # 用户选择了 "Cancel" 按钮，不做操作
+            pass
 
     #
     # def refresh_note_list(self):

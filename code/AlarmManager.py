@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 import threading
 from plyer import notification
@@ -6,11 +7,38 @@ from plyer import notification
 class AlarmManager:
     def __init__(self):
         self.timer_threads = {}
+        self.alarm_list = None
+        self.notes_file = 'note_file.json'
 
-    def set_alarm(self, title, message, date_time_str, alarm_id):
+    def trans_time(self, date_time_str):
         date_time_obj = datetime.strptime(date_time_str, "%Y/%m/%d %H:%M")
         new_date_str = date_time_obj.strftime("%Y-%m-%d %H:%M:%S")
         new_date_obj = datetime.strptime(new_date_str, "%Y-%m-%d %H:%M:%S")
+        return new_date_obj
+
+    def load_alarm(self):
+        # 从文件或数据库中加载保存的笔记列表
+        # 将加载的笔记存储在self.notes列表中
+        try:
+            with open(self.notes_file, 'r') as f:
+                self.alarm_list = json.load(f)
+                print(self.alarm_list)
+                print('success')
+        except FileNotFoundError:
+            print('FileNotFoundError')
+            # 如果文件不存在，则不做任何操作
+            pass
+        for alarm in self.alarm_list:
+            time_diff = (self.trans_time(alarm[2]) - datetime.now()).total_seconds()
+            if time_diff <= 0:
+                pass
+            else:
+                self.set_alarm(alarm[0],alarm[1],alarm[2])
+    def set_alarm(self, title, message, date_time_str, alarm_id):
+        # date_time_obj = datetime.strptime(date_time_str, "%Y/%m/%d %H:%M")
+        # new_date_str = date_time_obj.strftime("%Y-%m-%d %H:%M:%S")
+        # new_date_obj = datetime.strptime(new_date_str, "%Y-%m-%d %H:%M:%S")
+        new_date_obj = self.trans_time(date_time_str)
         time_diff = (new_date_obj - datetime.now()).total_seconds()
         print(time_diff)
         if time_diff <= 0:
