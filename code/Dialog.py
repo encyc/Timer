@@ -142,7 +142,8 @@ class TimerApp(QMainWindow):
             for j in range(len(item)):
                 item = QTableWidgetItem(str(self.note_list[i][j]))
                 self.tableWidget.setItem(i, j, item)
-
+                self.tableWidget.setHorizontalHeaderItem()
+                # self.retranslateUi(self.tableWidget)
 
     def add_note(self):
         note_dialog = NoteDialog()

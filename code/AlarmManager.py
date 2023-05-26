@@ -2,8 +2,8 @@ import json
 from datetime import datetime
 import threading
 from plyer import notification
-import plyer.platforms
-
+# 不知道为啥要import,但是打包就得import,不然报错
+import plyer.platforms.win.notification
 
 class AlarmManager:
     def __init__(self):
