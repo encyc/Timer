@@ -70,7 +70,6 @@ class TimerApp(QMainWindow):
         self.tableWidget.setHorizontalHeaderItem(2, item)
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(3, item)
-        self.verticalScrollBar = QtWidgets.QScrollBar(self.centralwidget)
 
         # 加载历史note信息
         self.get_note_list()
